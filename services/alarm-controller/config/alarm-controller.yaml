@@ -1,0 +1,38 @@
+# Alarm Controller Configuration - Platform 1.0
+service:
+  name: alarm-controller
+  version: "1.0.0"
+  host: "0.0.0.0"
+  port: 8004
+
+site:
+  id: "SITE-001"
+
+redis:
+  host: "${REDIS_HOST:-localhost}"
+  port: ${REDIS_PORT:-6379}
+  input_stream: "stream:alarms"
+
+gpio:
+  siren:
+    pin: 17
+    active_high: true
+    label: "사이렌"
+  light:
+    pin: 27
+    active_high: true
+    label: "경광등"
+
+alarm_policy:
+  critical:
+    actions: ["SIREN_ON", "LIGHT_ON"]
+    auto_timeout_seconds: null  # manual clear only
+  warning:
+    actions: ["LIGHT_ON"]
+    auto_timeout_seconds: 300  # 5분 후 자동 해제
+  test:
+    duration_ms: 1000
+
+logging:
+  log_all_actions: true
+  retention_days: 90
