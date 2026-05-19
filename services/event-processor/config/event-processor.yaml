@@ -1,0 +1,51 @@
+# Event Processor Configuration - Platform 1.0
+service:
+  name: event-processor
+  version: "1.0.0"
+  host: "0.0.0.0"
+  port: 8003
+
+site:
+  id: "SITE-001"
+
+redis:
+  host: "${REDIS_HOST:-localhost}"
+  port: ${REDIS_PORT:-6379}
+  input_stream: "stream:events"
+  output_streams:
+    alarm: "stream:alarms"
+    dashboard: "stream:dashboard"
+    cloud_queue: "stream:cloud_queue"
+
+risk_classification:
+  CRITICAL:
+    events:
+      - FALL_DETECTED
+      - ZONE_INTRUSION
+      - FIRE_DETECTED
+      - HEARTRATE_ABNORMAL
+      - BAND_FALL_DETECTED
+    alarm_actions: ["SIREN_ON", "LIGHT_ON"]
+    routes: ["alarm", "dashboard", "cloud", "nvr_clip", "log"]
+  WARNING:
+    events:
+      - ABNORMAL_BEHAVIOR
+      - ENV_THRESHOLD_EXCEEDED
+      - TEMPERATURE_ABNORMAL
+      - BAND_DISCONNECTED
+    alarm_actions: ["LIGHT_ON"]
+    routes: ["alarm", "dashboard", "cloud", "nvr_clip", "log"]
+  NORMAL:
+    events:
+      - NORMAL_RESTORED
+      - DEVICE_ONLINE
+    alarm_actions: []
+    routes: ["cloud", "log"]
+
+deduplication:
+  window_seconds: 10
+  same_device_same_type: true
+
+event_store:
+  max_active_events: 1000
+  archive_after_hours: 24
