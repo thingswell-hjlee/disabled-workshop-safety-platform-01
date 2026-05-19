@@ -1,0 +1,109 @@
+# Device Gateway Configuration - Platform 1.0
+service:
+  name: device-gateway
+  version: "1.0.0"
+  host: "0.0.0.0"
+  port: 8001
+
+site:
+  id: "SITE-001"
+
+redis:
+  host: "${REDIS_HOST:-localhost}"
+  port: ${REDIS_PORT:-6379}
+  password: "${REDIS_PASSWORD:-}"
+  streams:
+    frames_prefix: "stream:frames"
+    bio: "stream:bio"
+    sensors: "stream:sensors"
+  frame_ttl_seconds: 5
+
+mqtt:
+  broker_host: "${MQTT_BROKER_HOST:-localhost}"
+  broker_port: ${MQTT_BROKER_PORT:-1883}
+  username: "${MQTT_USERNAME:-}"
+  password: "${MQTT_PASSWORD:-}"
+  topics:
+    band: "safety/+/band/+/#"
+    env: "safety/+/env/+/data"
+
+cameras:
+  - device_id: "CAM-001"
+    rtsp_url: "rtsp://192.168.10.101:554/stream1"
+    fps: 15
+    resolution: "1920x1080"
+    inference_resolution: "640x640"
+  - device_id: "CAM-002"
+    rtsp_url: "rtsp://192.168.10.102:554/stream1"
+    fps: 15
+    resolution: "1920x1080"
+    inference_resolution: "640x640"
+  - device_id: "CAM-003"
+    rtsp_url: "rtsp://192.168.10.103:554/stream1"
+    fps: 15
+    resolution: "1920x1080"
+    inference_resolution: "640x640"
+  - device_id: "CAM-004"
+    rtsp_url: "rtsp://192.168.10.104:554/stream1"
+    fps: 15
+    resolution: "1920x1080"
+    inference_resolution: "640x640"
+  - device_id: "CAM-005"
+    rtsp_url: "rtsp://192.168.10.105:554/stream1"
+    fps: 15
+    resolution: "1920x1080"
+    inference_resolution: "640x640"
+  - device_id: "CAM-006"
+    rtsp_url: "rtsp://192.168.10.106:554/stream1"
+    fps: 15
+    resolution: "1920x1080"
+    inference_resolution: "640x640"
+  - device_id: "CAM-007"
+    rtsp_url: "rtsp://192.168.10.107:554/stream1"
+    fps: 15
+    resolution: "1920x1080"
+    inference_resolution: "640x640"
+  - device_id: "CAM-008"
+    rtsp_url: "rtsp://192.168.10.108:554/stream1"
+    fps: 15
+    resolution: "1920x1080"
+    inference_resolution: "640x640"
+
+bands:
+  - device_id: "BAND-001"
+    worker_id: "WKR-0001"
+  - device_id: "BAND-002"
+    worker_id: "WKR-0002"
+  - device_id: "BAND-003"
+    worker_id: "WKR-0003"
+  - device_id: "BAND-004"
+    worker_id: "WKR-0004"
+  - device_id: "BAND-005"
+    worker_id: "WKR-0005"
+  - device_id: "BAND-006"
+    worker_id: "WKR-0006"
+  - device_id: "BAND-007"
+    worker_id: "WKR-0007"
+  - device_id: "BAND-008"
+    worker_id: "WKR-0008"
+
+env_sensors:
+  - device_id: "ENV-001"
+    zone: "작업장A"
+  - device_id: "ENV-002"
+    zone: "작업장B"
+
+fire_detection:
+  device_id: "FIRE-001"
+  interface: "gpio"  # gpio | rs485
+  gpio_pin: 22
+  polling_interval_ms: 5000
+  debounce_ms: 500
+
+reconnect:
+  max_retries: 3
+  retry_interval_seconds: 5
+
+health_check:
+  interval_seconds: 10
+  timeout_seconds: 30
