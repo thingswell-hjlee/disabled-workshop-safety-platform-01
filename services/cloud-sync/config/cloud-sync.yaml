@@ -1,0 +1,49 @@
+# Cloud Sync Configuration - Platform 1.0
+service:
+  name: cloud-sync
+  version: "1.0.0"
+  host: "0.0.0.0"
+  port: 8005
+
+site:
+  id: "SITE-001"
+
+redis:
+  host: "${REDIS_HOST:-localhost}"
+  port: ${REDIS_PORT:-6379}
+  input_stream: "stream:cloud_queue"
+
+aws_iot:
+  endpoint: "${AWS_IOT_ENDPOINT}"
+  port: 8883
+  protocol: "mqtt"
+  cert_path: "${AWS_IOT_CERT_PATH:-/certs/device.pem.crt}"
+  key_path: "${AWS_IOT_KEY_PATH:-/certs/device.pem.key}"
+  ca_path: "${AWS_IOT_CA_PATH:-/certs/root-CA.crt}"
+  client_id: "edge-${SITE_ID:-SITE-001}"
+  topics:
+    events: "safety/${SITE_ID:-SITE-001}/events"
+    status: "safety/${SITE_ID:-SITE-001}/status"
+    models: "safety/${SITE_ID:-SITE-001}/models"
+
+aws_s3:
+  bucket: "${AWS_S3_BUCKET:-safety-platform-events}"
+  region: "${AWS_REGION:-ap-northeast-2}"
+  prefix: "events/"
+
+sync:
+  batch_size: 10
+  flush_interval_seconds: 5
+  max_retries: 5
+  retry_backoff_base_seconds: 2
+  idempotency_ttl_hours: 24
+
+offline_queue:
+  max_size: 10000
+  priority_order: ["HIGH", "NORMAL", "LOW"]
+  disk_backup_path: "/data/sync-queue-backup"
+  disk_backup_enabled: true
+
+health_check:
+  cloud_ping_interval_seconds: 30
+  offline_detection_threshold_seconds: 60
