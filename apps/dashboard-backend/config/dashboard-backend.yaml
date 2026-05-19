@@ -1,0 +1,33 @@
+# Dashboard Backend Configuration - Platform 1.0
+service:
+  name: dashboard-backend
+  version: "1.0.0"
+  host: "0.0.0.0"
+  port: 8080
+
+site:
+  id: "SITE-001"
+
+redis:
+  host: "${REDIS_HOST:-localhost}"
+  port: ${REDIS_PORT:-6379}
+  streams:
+    dashboard: "stream:dashboard"
+    events: "stream:events"
+
+auth:
+  jwt_secret: "${DASHBOARD_SECRET_KEY}"
+  access_token_expire_minutes: 30
+  refresh_token_expire_days: 7
+  session_timeout_minutes: 30
+  max_login_attempts: 5
+  lockout_minutes: 15
+
+cors:
+  allowed_origins:
+    - "http://localhost:3000"
+    - "https://dashboard.safety-platform.io"
+
+websocket:
+  ping_interval: 3
+  max_connections: 10
