@@ -1,0 +1,18 @@
+{
+  "event_id": "EVT-20250519143022-001",
+  "site_id": "SITE-001",
+  "device_id": "FIRE-001",
+  "worker_id": null,
+  "event_type": "FIRE_DETECTED",
+  "risk_level": "CRITICAL",
+  "confidence": null,
+  "model_version": null,
+  "timestamp": "2025-05-19T14:30:22.000Z",
+  "payload": {
+    "zone": "작업장B-전기실"
+  },
+  "acknowledged": false,
+  "acknowledged_by": null,
+  "acknowledged_at": null,
+  "acknowledged_reason": null
+}
