@@ -1,0 +1,122 @@
+{
+  "title": "AI Safety Event",
+  "description": "AI 기반 안전 이벤트 스키마 - Platform 1.0",
+  "type": "object",
+  "required": [
+    "event_id",
+    "site_id",
+    "device_id",
+    "event_type",
+    "risk_level",
+    "timestamp"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "pattern": "^EVT-\\d{14}-\\d{3}$",
+      "description": "이벤트 고유 식별자 (EVT-YYYYMMDDHHmmss-SEQ)"
+    },
+    "site_id": {
+      "type": "string",
+      "pattern": "^SITE-\\d{3}$",
+      "description": "현장 식별자"
+    },
+    "device_id": {
+      "type": "string",
+      "pattern": "^(CAM|BAND|ENV|FIRE|NVR|ALARM)-\\d{3}$",
+      "description": "장비 식별자"
+    },
+    "worker_id": {
+      "type": ["string", "null"],
+      "description": "작업자 식별자 (해당 시에만)"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "FALL_DETECTED",
+        "ABNORMAL_BEHAVIOR",
+        "ZONE_INTRUSION",
+        "FIRE_DETECTED",
+        "ENV_THRESHOLD_EXCEEDED",
+        "HEARTRATE_ABNORMAL",
+        "TEMPERATURE_ABNORMAL",
+        "BAND_FALL_DETECTED",
+        "BAND_DISCONNECTED",
+        "DEVICE_OFFLINE",
+        "DEVICE_ONLINE",
+        "SYSTEM_ALERT",
+        "NORMAL_RESTORED"
+      ],
+      "description": "이벤트 유형"
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": ["CRITICAL", "WARNING", "NORMAL"],
+      "description": "위험 등급"
+    },
+    "confidence": {
+      "type": ["number", "null"],
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "AI 추론 신뢰도 (0.0~1.0)"
+    },
+    "model_version": {
+      "type": ["string", "null"],
+      "description": "사용된 AI 모델 버전"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "이벤트 발생 시각 (ISO 8601)"
+    },
+    "payload": {
+      "type": "object",
+      "description": "이벤트 유형별 추가 데이터",
+      "properties": {
+        "bbox": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 4,
+          "maxItems": 4,
+          "description": "바운딩 박스 [x, y, width, height]"
+        },
+        "zone": {
+          "type": "string",
+          "description": "감지 구역명"
+        },
+        "frame_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "관련 영상 클립 URL"
+        },
+        "sensor_values": {
+          "type": "object",
+          "description": "센서 측정값"
+        },
+        "bio_values": {
+          "type": "object",
+          "description": "생체 데이터"
+        }
+      }
+    },
+    "acknowledged": {
+      "type": "boolean",
+      "default": false,
+      "description": "알람 해제 여부"
+    },
+    "acknowledged_by": {
+      "type": ["string", "null"],
+      "description": "알람 해제자 ID"
+    },
+    "acknowledged_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "알람 해제 시각"
+    },
+    "acknowledged_reason": {
+      "type": ["string", "null"],
+      "description": "알람 해제 사유"
+    }
+  },
+  "additionalProperties": false
+}

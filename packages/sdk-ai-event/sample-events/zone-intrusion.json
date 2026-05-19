@@ -1,0 +1,20 @@
+{
+  "event_id": "EVT-20250519141230-001",
+  "site_id": "SITE-001",
+  "device_id": "CAM-006",
+  "worker_id": "WKR-0003",
+  "event_type": "ZONE_INTRUSION",
+  "risk_level": "CRITICAL",
+  "confidence": 0.88,
+  "model_version": "v1.0.0-edge",
+  "timestamp": "2025-05-19T14:12:30.456Z",
+  "payload": {
+    "bbox": [200, 150, 280, 400],
+    "zone": "장비실-접근금지구역",
+    "frame_url": "s3://safety-platform-events/clips/EVT-20250519141230-001.mp4"
+  },
+  "acknowledged": false,
+  "acknowledged_by": null,
+  "acknowledged_at": null,
+  "acknowledged_reason": null
+}
