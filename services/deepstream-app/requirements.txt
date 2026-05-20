@@ -1,0 +1,6 @@
+# DeepStream App - Platform 1.0 Dependencies
+redis==5.0.4
+pyyaml==6.0.1
+pytest==8.2.0
+pytest-mock==3.14.0
+jsonschema==4.22.0

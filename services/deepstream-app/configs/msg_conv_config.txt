@@ -1,0 +1,26 @@
+# Message Converter Configuration
+# Platform 1.0 - DeepStream to Redis Streams message format
+# Converts DeepStream metadata to stream:ds-events JSON format
+
+[sensor]
+enable=1
+type=Camera
+id=CAM-001
+location=SITE-001
+
+[place]
+enable=1
+type=WorkshopZone
+id=ZONE-001
+
+[analytics]
+enable=1
+source=DeepStream
+version=1.0.0
+
+# Custom payload schema matching PR #16 event-message-schema
+[message-payload]
+payload-type=0
+# 0 = Minimal payload (event_id, site_id, device_id, etc.)
+# 1 = Full payload with context
+msg-conv-msg2p-lib=/opt/nvidia/deepstream/deepstream/lib/libnvds_msgconv.so
