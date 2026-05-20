@@ -1,0 +1,6 @@
+person
+fall
+collapse
+fire
+intrusion
+hazardous_action

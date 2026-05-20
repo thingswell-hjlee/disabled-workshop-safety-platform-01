@@ -1,0 +1,102 @@
+# ============================================================
+# Platform 1.0 - DeepStream Edge Pipeline (개발/테스트용)
+# docker compose -f docker-compose.edge.yml up -d
+# ============================================================
+version: "3.9"
+
+services:
+  # --- Infrastructure ---
+  redis:
+    image: redis:7-alpine
+    container_name: safety-edge-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  # --- DeepStream App (Mock Mode) ---
+  deepstream-app-mock:
+    build:
+      context: ./services/deepstream-app
+      dockerfile: Dockerfile
+      args:
+        MODE: mock
+    container_name: safety-deepstream-mock
+    restart: always
+    ports:
+      - "8010:8010"
+    environment:
+      - SITE_ID=SITE-001
+      - DEEPSTREAM_MOCK_MODE=true
+      - MOCK_EVENT_INTERVAL_SEC=5.0
+      - HEALTHCHECK_PORT=8010
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_STREAM_NAME=stream:ds-events
+      - MODEL_VERSION=v1.0.0-tao-ds
+      - MAX_CHANNELS=8
+      - LOG_LEVEL=INFO
+      - CAMERAS_CONFIG_PATH=/app/config/cameras.json
+    volumes:
+      - ./config/cameras.example.json:/app/config/cameras.json:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # --- DeepStream App (GPU Mode) ---
+  # Uncomment below for real GPU deployment
+  # deepstream-app-gpu:
+  #   build:
+  #     context: ./services/deepstream-app
+  #     dockerfile: Dockerfile
+  #     args:
+  #       MODE: gpu
+  #   container_name: safety-deepstream-gpu
+  #   restart: always
+  #   ports:
+  #     - "8010:8010"
+  #   environment:
+  #     - SITE_ID=SITE-001
+  #     - DEEPSTREAM_MOCK_MODE=false
+  #     - HEALTHCHECK_PORT=8010
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #     - REDIS_STREAM_NAME=stream:ds-events
+  #     - MODEL_VERSION=v1.0.0-tao-ds
+  #     - MAX_CHANNELS=8
+  #     - LOG_LEVEL=INFO
+  #     - CAMERAS_CONFIG_PATH=/app/config/cameras.json
+  #   volumes:
+  #     - ./config/cameras.example.json:/app/config/cameras.json:ro
+  #     - models-data:/models:ro
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+
+volumes:
+  redis-data:
+  # models-data:

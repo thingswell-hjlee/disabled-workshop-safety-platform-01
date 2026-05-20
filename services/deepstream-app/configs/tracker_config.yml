@@ -1,0 +1,42 @@
+# NvDCF Tracker Configuration
+# Platform 1.0 - Multi-Object Tracking for Safety Detection
+# Tracker: NVIDIA NvDCF (Deep Correlation Filter)
+
+%YAML:1.0
+
+BaseConfig:
+  minDetectorConfidence: 0.4
+  minTrackerConfidence: 0.5
+  minMatchingScore4Overall: 0.2
+  minTrailingScore4Overall: 0.4
+  minHits4Overall: 3
+  maxShadowTrackingAge: 30
+  probationAge: 3
+  earlyTerminationAge: 1
+
+TargetManagement:
+  enableBBoxUnClipping: 0
+  maxTargetsPerStream: 50
+  minIouDiff4NewTarget: 0.5
+  preserveStreamUpdateOrder: 0
+  maxShadowTrackingAge: 30
+  probationAge: 3
+  earlyTerminationAge: 1
+
+TrajectoryManagement:
+  useUniqueID: 1
+
+DataAssociator:
+  dataAssociatorType: 0
+  associationMatcherType: 1
+  checkClassMatch: 1
+  minMatchingScore4Overall: 0.2
+  minMatchingScore4SizeSimilarity: 0.5
+  minMatchingScore4Iou: 0.2
+  thresholdMahalanobis: 9.4877
+
+StateEstimator:
+  stateEstimatorType: 1
+  noiseWeightVar4Loc: 0.05
+  noiseWeightVar4Vel: 0.00625
+  useAspectRatio: 1

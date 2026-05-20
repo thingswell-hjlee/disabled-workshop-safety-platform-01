@@ -1,0 +1,70 @@
+# Primary GIE (Inference Engine) Configuration
+# Platform 1.0 - Safety Detector Model
+# Model: TAO Toolkit trained, TensorRT FP16 optimized
+
+[property]
+gpu-id=0
+net-scale-factor=0.00392157
+model-color-format=0
+
+# TensorRT engine file (pre-built)
+model-engine-file=/models/active/pgie/model.engine
+
+# Labels file
+labelfile-path=/models/active/pgie/labels.txt
+
+# Model architecture
+network-type=0
+# 0=Detector, 1=Classifier, 2=Segmentation
+
+# Input dimensions (must match training)
+infer-dims=3;544;960
+
+# Number of classes
+num-detected-classes=6
+
+# Batch size (matches streammux)
+batch-size=8
+
+# Confidence thresholds per class
+# Classes: person(0), fall(1), collapse(2), fire(3), intrusion(4), hazardous_action(5)
+[class-attrs-all]
+pre-cluster-threshold=0.5
+topk=20
+nms-iou-threshold=0.5
+
+# Person - higher threshold to reduce false positives
+[class-attrs-0]
+pre-cluster-threshold=0.6
+topk=50
+nms-iou-threshold=0.4
+
+# Fall - lower threshold for safety-critical events
+[class-attrs-1]
+pre-cluster-threshold=0.4
+topk=20
+nms-iou-threshold=0.5
+
+# Collapse - lower threshold for safety-critical events
+[class-attrs-2]
+pre-cluster-threshold=0.4
+topk=20
+nms-iou-threshold=0.5
+
+# Fire - lowest threshold for safety-critical events
+[class-attrs-3]
+pre-cluster-threshold=0.3
+topk=10
+nms-iou-threshold=0.5
+
+# Zone intrusion
+[class-attrs-4]
+pre-cluster-threshold=0.5
+topk=20
+nms-iou-threshold=0.5
+
+# Hazardous action
+[class-attrs-5]
+pre-cluster-threshold=0.5
+topk=20
+nms-iou-threshold=0.5
