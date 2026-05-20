@@ -1,0 +1,113 @@
+{
+  "stream:ds-events": [
+    {
+      "_description": "DeepStream FALL_DETECTED inference output",
+      "event_id": "EVT-20250519120000-001",
+      "site_id": "SITE-001",
+      "source_id": "pipeline-0",
+      "device_id": "CAM-001",
+      "event_type": "FALL_DETECTED",
+      "timestamp": "2025-05-19T12:00:00.123Z",
+      "model_version": "v1.0.0-tao-ds",
+      "inference": {
+        "pgie": {
+          "class_id": 2,
+          "confidence": 0.92,
+          "label": "fall",
+          "bbox": {"x": 0.35, "y": 0.45, "w": 0.15, "h": 0.20}
+        },
+        "sgie": null,
+        "tracker": {
+          "object_id": 42,
+          "age_frames": 15
+        }
+      },
+      "analytics": null
+    }
+  ],
+  "stream:sensors": [
+    {
+      "_description": "Smart Band heartrate abnormal",
+      "event_id": "EVT-20250519120100-005",
+      "site_id": "SITE-001",
+      "device_id": "BAND-003",
+      "worker_id": "WKR-0012",
+      "event_type": "HEARTRATE_ABNORMAL",
+      "timestamp": "2025-05-19T12:01:00.456Z",
+      "data_type": "HEARTRATE",
+      "value": 142,
+      "source": "SMART_BAND"
+    },
+    {
+      "_description": "Environment sensor gas threshold exceeded",
+      "event_id": "EVT-20250519123000-007",
+      "site_id": "SITE-001",
+      "device_id": "ENV-002",
+      "worker_id": null,
+      "event_type": "ENV_THRESHOLD_EXCEEDED",
+      "timestamp": "2025-05-19T12:30:00.444Z",
+      "data_type": "GAS",
+      "value": 28.5,
+      "source": "ENV_SENSOR"
+    }
+  ],
+  "stream:alarms": [
+    {
+      "_description": "CRITICAL alarm triggered by FALL_DETECTED",
+      "event_id": "EVT-20250519120000-001",
+      "site_id": "SITE-001",
+      "risk_level": "CRITICAL",
+      "action": "ALL_ON",
+      "timestamp": "2025-05-19T12:00:00.200Z",
+      "source_event_type": "FALL_DETECTED"
+    }
+  ],
+  "stream:dashboard": [
+    {
+      "_description": "Dashboard event for FALL_DETECTED",
+      "event_id": "EVT-20250519120000-001",
+      "site_id": "SITE-001",
+      "device_id": "CAM-001",
+      "worker_id": null,
+      "event_type": "FALL_DETECTED",
+      "risk_level": "CRITICAL",
+      "timestamp": "2025-05-19T12:00:00.123Z",
+      "event_state": "ACTIVE",
+      "confidence": 0.92,
+      "model_version": "v1.0.0-tao-ds",
+      "context": {
+        "summary": "작업장 A구역 낙상 감지 (신뢰도 92%)",
+        "location": "A구역 프레스실",
+        "clip_available": true
+      }
+    }
+  ],
+  "stream:cloud-queue": [
+    {
+      "_description": "Cloud queue entry for FALL_DETECTED",
+      "event_id": "EVT-20250519120000-001",
+      "site_id": "SITE-001",
+      "device_id": "CAM-001",
+      "worker_id": null,
+      "event_type": "FALL_DETECTED",
+      "risk_level": "CRITICAL",
+      "timestamp": "2025-05-19T12:00:00.123Z",
+      "idempotency_key": "SITE-001:EVT-20250519120000-001",
+      "priority": "HIGH",
+      "clip_path": "/data/clips/EVT-20250519120000-001.mp4",
+      "confidence": 0.92,
+      "model_version": "v1.0.0-tao-ds"
+    }
+  ],
+  "stream:clip-trigger": [
+    {
+      "_description": "Clip trigger for FALL_DETECTED",
+      "event_id": "EVT-20250519120000-001",
+      "site_id": "SITE-001",
+      "device_id": "CAM-001",
+      "trigger_ts": "2025-05-19T12:00:00.123Z",
+      "pre_sec": 30,
+      "post_sec": 30
+    }
+  ]
+}

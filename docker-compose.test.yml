@@ -1,0 +1,46 @@
+version: "3.8"
+
+# Platform 1.0 Integration Test Environment
+# Usage: docker-compose -f docker-compose.test.yml up -d
+
+services:
+  redis-test:
+    image: redis:7-alpine
+    container_name: safety-redis-test
+    ports:
+      - "6380:6379"
+    command: >
+      redis-server
+      --maxmemory 128mb
+      --maxmemory-policy allkeys-lru
+      --appendonly no
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - test-network
+
+  postgres-test:
+    image: postgres:15-alpine
+    container_name: safety-postgres-test
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: safety_test
+      POSTGRES_USER: safety_test
+      POSTGRES_PASSWORD: test_password
+    volumes:
+      - ./tests/fixtures/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U safety_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - test-network
+
+networks:
+  test-network:
+    driver: bridge
