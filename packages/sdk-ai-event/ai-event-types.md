@@ -1,69 +1,76 @@
 # AI Event Types - Platform 1.0
 
-## 1. 이벤트 유형 정의
+> **PR #16 동결 스키마 기준** (docs/event-message-schema.md, docs/interface-schema.md)
 
-### 1.1 CRITICAL 등급 이벤트
+## 1. 이벤트 유형 정의 (15종)
 
-| event_type | 설명 | 트리거 조건 | 알람 동작 |
-|------------|------|-------------|-----------|
-| `FALL_DETECTED` | 작업자 낙상 감지 | 영상 AI 낙상 판단 (confidence ≥ 0.7) | 사이렌+경광등 |
-| `ZONE_INTRUSION` | 위험구역 침입 | 설정된 polygon 영역 내 사람 감지 | 사이렌+경광등 |
-| `FIRE_DETECTED` | 화재 감지 | 화재감지기 접점 신호 수신 | 사이렌+경광등 |
-| `HEARTRATE_ABNORMAL` | 심박 이상 | 심박 < 40 또는 > 150 bpm | 사이렌+경광등 |
-| `BAND_FALL_DETECTED` | 밴드 낙상 감지 | 가속도 급변 패턴 감지 | 사이렌+경광등 |
+### 1.1 CRITICAL 등급 이벤트 (C-001 규칙)
+
+> FALL_DETECTED, COLLAPSE_DETECTED, FIRE_DETECTED → 반드시 CRITICAL
+
+| event_type | 설명 | 소스 | 트리거 조건 |
+|------------|------|------|-------------|
+| `FALL_DETECTED` | 작업자 낙상 감지 | DeepStream (Vision AI) | 영상 AI 낙상 판단 |
+| `COLLAPSE_DETECTED` | 작업자 쓰러짐 감지 | DeepStream (Vision AI) | 영상 AI 쓰러짐 판단 |
+| `FIRE_DETECTED` | 화재 감지 | DeepStream / Fire Contact | 화재감지기 접점 또는 영상 AI |
 
 ### 1.2 WARNING 등급 이벤트
 
-| event_type | 설명 | 트리거 조건 | 알람 동작 |
-|------------|------|-------------|-----------|
-| `ABNORMAL_BEHAVIOR` | 이상행동 감지 | 장시간 부동 또는 급격한 움직임 | 경광등만 |
-| `ENV_THRESHOLD_EXCEEDED` | 환경 임계치 초과 | 온도/습도/CO/VOC 임계치 초과 | 경광등만 |
-| `TEMPERATURE_ABNORMAL` | 체온 이상 | 체온 < 35 또는 > 38.5°C | 경광등만 |
-| `BAND_DISCONNECTED` | 밴드 연결 끊김 | 30초 이상 데이터 미수신 | 경광등만 |
+| event_type | 설명 | 소스 | 트리거 조건 |
+|------------|------|------|-------------|
+| `ZONE_INTRUSION` | 위험구역 침입 | DeepStream (Vision AI) | 설정 polygon 영역 내 사람 감지 |
+| `STILLNESS_DETECTED` | 장시간 미움직임 | DeepStream (Vision AI) | 설정 시간 이상 부동 |
+| `HAZARDOUS_ACTION` | 위험행동 감지 | DeepStream (Vision AI) | 위험행동 패턴 판단 |
+| `HEARTRATE_ABNORMAL` | 심박 이상 | Smart Band | 심박 < 40 또는 > 150 bpm |
+| `TEMPERATURE_ABNORMAL` | 체온 이상 | Smart Band | 체온 < 35 또는 > 38.5°C |
+| `BAND_FALL_DETECTED` | 밴드 낙상 감지 | Smart Band | 가속도 급변 패턴 감지 |
+| `BAND_DISCONNECTED` | 밴드 연결 끊김 | Smart Band | 30초 이상 데이터 미수신 |
+| `ENV_THRESHOLD_EXCEEDED` | 환경 임계치 초과 | Environmental Sensor | 온습도/가스/미세먼지 임계치 초과 |
 
 ### 1.3 NORMAL 등급 이벤트
 
-| event_type | 설명 | 트리거 조건 | 알람 동작 |
-|------------|------|-------------|-----------|
-| `NORMAL_RESTORED` | 정상 복귀 | 이상 상태 해소 | 알람 없음 |
-| `DEVICE_ONLINE` | 장비 온라인 복귀 | 오프라인→온라인 전환 | 알람 없음 |
-
-### 1.4 시스템 이벤트
-
-| event_type | 설명 | 트리거 조건 | 알람 동작 |
-|------------|------|-------------|-----------|
-| `DEVICE_OFFLINE` | 장비 오프라인 | 연결 끊김 + 재연결 실패 | 대시보드 경고 |
-| `SYSTEM_ALERT` | 시스템 경고 | NVR 용량, GPU 장애 등 | 대시보드 경고 |
+| event_type | 설명 | 소스 | 트리거 조건 |
+|------------|------|------|-------------|
+| `DEVICE_OFFLINE` | 장비 오프라인 | Device Gateway | 연결 끊김 + 재연결 실패 |
+| `DEVICE_ONLINE` | 장비 온라인 복귀 | Device Gateway | 오프라인→온라인 전환 |
+| `NORMAL_RESTORED` | 정상 복귀 | Event Engine | 이상 상태 해소 |
+| `SYSTEM_ALERT` | 시스템 경고 | System | NVR 용량, GPU 장애 등 |
 
 ## 2. 위험등급 판정 규칙
 
-### 2.1 기본 매핑
+### 2.1 기본 매핑 (PR #16 C-001)
 
 ```yaml
 risk_classification:
   CRITICAL:
     - FALL_DETECTED
-    - ZONE_INTRUSION
+    - COLLAPSE_DETECTED
     - FIRE_DETECTED
-    - HEARTRATE_ABNORMAL
-    - BAND_FALL_DETECTED
   WARNING:
-    - ABNORMAL_BEHAVIOR
-    - ENV_THRESHOLD_EXCEEDED
+    - ZONE_INTRUSION
+    - STILLNESS_DETECTED
+    - HAZARDOUS_ACTION
+    - HEARTRATE_ABNORMAL
     - TEMPERATURE_ABNORMAL
+    - BAND_FALL_DETECTED
     - BAND_DISCONNECTED
+    - ENV_THRESHOLD_EXCEEDED
   NORMAL:
-    - NORMAL_RESTORED
+    - DEVICE_OFFLINE
     - DEVICE_ONLINE
+    - NORMAL_RESTORED
+    - SYSTEM_ALERT
 ```
 
 ### 2.2 confidence 기반 필터
 
 | event_type | 최소 confidence | 비고 |
 |------------|----------------|------|
-| FALL_DETECTED | 0.70 | 미만 시 WARNING으로 하향 |
-| ABNORMAL_BEHAVIOR | 0.65 | 미만 시 무시 |
-| ZONE_INTRUSION | 0.75 | 미만 시 WARNING으로 하향 |
+| FALL_DETECTED | 0.70 | 미만 시 이벤트 생성하지 않음 |
+| COLLAPSE_DETECTED | 0.70 | 미만 시 이벤트 생성하지 않음 |
+| ZONE_INTRUSION | 0.75 | 미만 시 이벤트 생성하지 않음 |
+| STILLNESS_DETECTED | 0.65 | 미만 시 이벤트 생성하지 않음 |
+| HAZARDOUS_ACTION | 0.70 | 미만 시 이벤트 생성하지 않음 |
 
 ### 2.3 복합 판정 규칙
 
@@ -79,12 +86,12 @@ risk_classification:
   │         │          │              │                 │                    └── 클라우드 저장
   │         │          │              │                 └── 관리자 수동 해제
   │         │          │              └── WebSocket 실시간 전송
-  │         │          └── Alarm Controller GPIO 출력
-  │         └── Risk Classifier 등급 판정
-  └── AI Inference / Sensor Handler 이벤트 생성
+  │         │          └── Alarm Controller (stream:alarms)
+  │         └── Event Engine 등급 판정
+  └── AI Inference / Device Gateway 이벤트 생성
 ```
 
-### 3.1 상태 전이
+### 3.1 상태 전이 (event_state)
 
 ```
 ACTIVE → ACKNOWLEDGED → ARCHIVED
@@ -99,13 +106,10 @@ ACTIVE → ACKNOWLEDGED → ARCHIVED
 
 | 목적지 | CRITICAL | WARNING | NORMAL |
 |--------|----------|---------|--------|
-| 접점 알람 (사이렌) | ✅ | ❌ | ❌ |
-| 접점 알람 (경광등) | ✅ | ✅ | ❌ |
-| 대시보드 팝업 | ✅ | ✅ | ❌ |
-| Web Push | ✅ | ✅ | ❌ |
-| 이벤트 로그 | ✅ | ✅ | ✅ |
-| 클라우드 전송 | ✅ | ✅ | ✅ |
-| NVR 클립 저장 | ✅ | ✅ | ❌ |
+| stream:alarms (사이렌+경광등) | ALL_ON | LIGHT_ON | ALL_OFF |
+| stream:dashboard | ✅ | ✅ | ✅ |
+| stream:cloud-queue | HIGH | NORMAL | LOW |
+| stream:clip-trigger | ✅ | ✅ | ❌ |
 
 ## 5. ID 생성 규칙
 
@@ -114,21 +118,18 @@ ACTIVE → ACKNOWLEDGED → ARCHIVED
 ```
 EVT-{YYYYMMDDHHmmss}-{SEQ}
 예: EVT-20250519120000-001
+Pattern: ^EVT-\d{14}-\d{3}$
 ```
 
-- `timestamp`: 이벤트 발생 시각 (로컬 시간)
-- `SEQ`: 동일 초 내 순번 (001~999)
-- 유일성: timestamp + SEQ 조합으로 보장
+### 5.2 기타 ID (PR #16 동결)
 
-### 5.2 기타 ID
-
-| ID | 형식 | 예시 |
-|----|------|------|
-| site_id | `SITE-{NNN}` | SITE-001 |
-| device_id | `{TYPE}-{NNN}` | CAM-001, BAND-003 |
-| worker_id | `WKR-{NNNN}` | WKR-0001 |
-| model_version | `v{M}.{m}.{p}-{target}` | v1.0.0-edge |
+| ID | 형식 | Pattern | 예시 |
+|----|------|---------|------|
+| site_id | `SITE-{NNN}` | `^SITE-\d{3}$` | SITE-001 |
+| device_id | `{TYPE}-{NNN}` | `^(CAM\|BAND\|ENV\|FIRE\|NVR\|ALARM)-\d{3}$` | CAM-001 |
+| worker_id | `WKR-{NNNN}` | `^WKR-\d{4}$` | WKR-0001 |
+| model_version | `v{M}.{m}.{p}-{tool}-{target}` | `^v\d+\.\d+\.\d+-(tao\|pretrained\|custom)-(ds\|cloud)$` | v1.0.0-tao-ds |
 
 ---
 
-*버전: 0.1 | 작성일: 2025-05-19*
+*버전: 1.0 | PR #16 동결 기준 | 작성일: 2025-05-20*

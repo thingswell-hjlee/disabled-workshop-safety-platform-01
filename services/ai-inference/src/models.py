@@ -1,20 +1,35 @@
-"""AI Inference - Data Models & Type Definitions"""
+"""AI Inference - Data Models & Type Definitions
+
+PR #16 동결 스키마 기준으로 정의.
+event_type, risk_level은 packages/sdk-common/src/constants.py에서 import하여 사용.
+"""
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Optional
 
 
 class EventType(str, Enum):
+    """PR #16 동결 event_type enum (15종)"""
+    # Vision AI events
     FALL_DETECTED = "FALL_DETECTED"
-    ABNORMAL_BEHAVIOR = "ABNORMAL_BEHAVIOR"
+    COLLAPSE_DETECTED = "COLLAPSE_DETECTED"
     ZONE_INTRUSION = "ZONE_INTRUSION"
+    STILLNESS_DETECTED = "STILLNESS_DETECTED"
+    HAZARDOUS_ACTION = "HAZARDOUS_ACTION"
     FIRE_DETECTED = "FIRE_DETECTED"
-    ENV_THRESHOLD_EXCEEDED = "ENV_THRESHOLD_EXCEEDED"
+    # Smart Band events
     HEARTRATE_ABNORMAL = "HEARTRATE_ABNORMAL"
     TEMPERATURE_ABNORMAL = "TEMPERATURE_ABNORMAL"
     BAND_FALL_DETECTED = "BAND_FALL_DETECTED"
     BAND_DISCONNECTED = "BAND_DISCONNECTED"
+    # Environmental Sensor events
+    ENV_THRESHOLD_EXCEEDED = "ENV_THRESHOLD_EXCEEDED"
+    # Device status events
+    DEVICE_OFFLINE = "DEVICE_OFFLINE"
+    DEVICE_ONLINE = "DEVICE_ONLINE"
+    # System events
     NORMAL_RESTORED = "NORMAL_RESTORED"
+    SYSTEM_ALERT = "SYSTEM_ALERT"
 
 
 class RiskLevel(str, Enum):
@@ -32,10 +47,11 @@ class ModelType(str, Enum):
 
 @dataclass
 class BoundingBox:
+    """Normalized bounding box (0.0~1.0) per PR #16 inference_detail.bbox"""
     x: float
     y: float
-    width: float
-    height: float
+    w: float
+    h: float
 
 
 @dataclass
@@ -45,12 +61,12 @@ class DetectionResult:
     confidence: float
     bbox: Optional[BoundingBox] = None
     zone: Optional[str] = None
-    model_version: str = ""
+    model_version: str = ""  # Format: v{M}.{m}.{p}-{tool}-{target}
 
 
 @dataclass
 class InferenceEvent:
-    """Event produced by inference engine → stream:events"""
+    """Event produced by inference engine → stream:ds-events"""
     event_id: str
     site_id: str
     device_id: str
@@ -58,8 +74,9 @@ class InferenceEvent:
     event_type: EventType
     risk_level: RiskLevel
     confidence: float
-    model_version: str
+    model_version: str  # Format: v{M}.{m}.{p}-{tool}-{target} (e.g. v1.0.0-tao-ds)
     timestamp: str
+    source_id: str = "pipeline-0"
     payload: dict = field(default_factory=dict)
 
 
@@ -68,11 +85,12 @@ class ModelInfo:
     """Loaded model information"""
     model_id: str
     model_type: ModelType
-    model_version: str
-    framework: str  # "tensorrt" | "onnx"
-    input_shape: List[int] = field(default_factory=lambda: [1, 3, 640, 640])
+    model_version: str  # Format: v{M}.{m}.{p}-{tool}-{target}
+    framework: str  # "TAO" | "PyTorch" | "TensorFlow" | "ONNX"
+    precision: str = "FP16"  # "FP16" | "FP32" | "INT8"
+    input_shape: List[int] = field(default_factory=lambda: [1, 3, 544, 960])
     device: str = "cuda:0"
-    status: str = "loaded"  # loaded | loading | error
+    status: str = "ACTIVE"  # ACTIVE | STAGED | ROLLBACK | ARCHIVED
 
 
 @dataclass

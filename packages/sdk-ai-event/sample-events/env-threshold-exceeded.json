@@ -1,24 +1,30 @@
 {
-  "event_id": "EVT-20250519091500-003",
+  "event_id": "EVT-20250519123000-007",
   "site_id": "SITE-001",
-  "device_id": "ENV-001",
-  "worker_id": null,
+  "device_id": "ENV-002",
   "event_type": "ENV_THRESHOLD_EXCEEDED",
   "risk_level": "WARNING",
+  "timestamp": "2025-05-19T12:30:00.456Z",
+  "event_state": "ACTIVE",
+  "worker_id": null,
   "confidence": null,
   "model_version": null,
-  "timestamp": "2025-05-19T09:15:00.000Z",
-  "payload": {
-    "zone": "작업장A",
-    "sensor_values": {
-      "temperature": 42.3,
-      "humidity": 65.0,
-      "co_ppm": 12.5,
-      "voc_ppb": 180
-    }
+  "context": {
+    "video_clip": null,
+    "sensor_snapshot": {
+      "data_type": "GAS",
+      "value": 28.5,
+      "unit": "ppm",
+      "threshold": 25.0,
+      "duration_above_threshold_sec": 120
+    },
+    "inference_detail": null,
+    "system_state": null
   },
-  "acknowledged": false,
-  "acknowledged_by": null,
-  "acknowledged_at": null,
-  "acknowledged_reason": null
+  "feedback_type": null,
+  "activity_index_history": null,
+  "baseline_profile": null,
+  "reanalysis_result": null,
+  "audit_hash": null,
+  "rag_reference": null
 }

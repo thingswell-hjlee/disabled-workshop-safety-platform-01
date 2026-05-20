@@ -1,22 +1,30 @@
 {
-  "event_id": "EVT-20250519103045-002",
+  "event_id": "EVT-20250519120100-005",
   "site_id": "SITE-001",
-  "device_id": "BAND-005",
-  "worker_id": "WKR-0005",
+  "device_id": "BAND-003",
   "event_type": "HEARTRATE_ABNORMAL",
-  "risk_level": "CRITICAL",
+  "risk_level": "WARNING",
+  "timestamp": "2025-05-19T12:01:00.222Z",
+  "event_state": "ACTIVE",
+  "worker_id": "WKR-0012",
   "confidence": null,
   "model_version": null,
-  "timestamp": "2025-05-19T10:30:45.000Z",
-  "payload": {
-    "zone": "작업장A-남측",
-    "bio_values": {
-      "heartrate_bpm": 165,
-      "body_temperature": 37.2
-    }
+  "context": {
+    "video_clip": null,
+    "sensor_snapshot": {
+      "data_type": "HEARTRATE",
+      "value": 142.0,
+      "unit": "bpm",
+      "threshold": 120.0,
+      "duration_above_threshold_sec": 30
+    },
+    "inference_detail": null,
+    "system_state": null
   },
-  "acknowledged": false,
-  "acknowledged_by": null,
-  "acknowledged_at": null,
-  "acknowledged_reason": null
+  "feedback_type": null,
+  "activity_index_history": null,
+  "baseline_profile": null,
+  "reanalysis_result": null,
+  "audit_hash": null,
+  "rag_reference": null
 }

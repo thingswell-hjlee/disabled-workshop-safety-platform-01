@@ -1,18 +1,30 @@
 {
-  "event_id": "EVT-20250519143022-001",
+  "event_id": "EVT-20250519121500-003",
   "site_id": "SITE-001",
   "device_id": "FIRE-001",
-  "worker_id": null,
   "event_type": "FIRE_DETECTED",
   "risk_level": "CRITICAL",
+  "timestamp": "2025-05-19T12:15:00.789Z",
+  "event_state": "ACTIVE",
+  "worker_id": null,
   "confidence": null,
   "model_version": null,
-  "timestamp": "2025-05-19T14:30:22.000Z",
-  "payload": {
-    "zone": "작업장B-전기실"
+  "context": {
+    "video_clip": null,
+    "sensor_snapshot": {
+      "data_type": "FIRE_CONTACT",
+      "value": 1.0,
+      "unit": "boolean",
+      "threshold": 1.0,
+      "duration_above_threshold_sec": null
+    },
+    "inference_detail": null,
+    "system_state": null
   },
-  "acknowledged": false,
-  "acknowledged_by": null,
-  "acknowledged_at": null,
-  "acknowledged_reason": null
+  "feedback_type": null,
+  "activity_index_history": null,
+  "baseline_profile": null,
+  "reanalysis_result": null,
+  "audit_hash": null,
+  "rag_reference": null
 }

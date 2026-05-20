@@ -1,20 +1,24 @@
-"""Event Processor - Data Models & Type Definitions"""
+"""Event Processor - Data Models & Type Definitions
+
+PR #16 동결 스키마 기준으로 정의.
+"""
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
 
 class EventState(str, Enum):
+    """PR #16 동결: event_state enum"""
     ACTIVE = "ACTIVE"
     ACKNOWLEDGED = "ACKNOWLEDGED"
     ARCHIVED = "ARCHIVED"
 
 
 class AlarmAction(str, Enum):
+    """PR #16 동결: stream:alarms action enum"""
     SIREN_ON = "SIREN_ON"
     LIGHT_ON = "LIGHT_ON"
-    SIREN_OFF = "SIREN_OFF"
-    LIGHT_OFF = "LIGHT_OFF"
+    ALL_ON = "ALL_ON"
     ALL_OFF = "ALL_OFF"
 
 
@@ -45,17 +49,18 @@ class ProcessedEvent:
     event_type: str
     risk_level: str
     confidence: Optional[float]
-    model_version: Optional[str]
+    model_version: Optional[str]  # Format: v{M}.{m}.{p}-{tool}-{target}
     timestamp: str
-    state: EventState = EventState.ACTIVE
-    payload: dict = field(default_factory=dict)
+    event_state: EventState = EventState.ACTIVE
+    context: dict = field(default_factory=dict)
     routed_to: list = field(default_factory=list)
 
 
 @dataclass
 class AlarmCommand:
-    """Command sent to alarm-controller service"""
+    """Command sent to alarm-controller service via stream:alarms"""
     event_id: str
+    site_id: str
     risk_level: str
     action: AlarmAction
     timestamp: str

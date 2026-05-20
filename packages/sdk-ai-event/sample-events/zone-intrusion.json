@@ -2,19 +2,38 @@
   "event_id": "EVT-20250519141230-001",
   "site_id": "SITE-001",
   "device_id": "CAM-006",
-  "worker_id": "WKR-0003",
   "event_type": "ZONE_INTRUSION",
-  "risk_level": "CRITICAL",
-  "confidence": 0.88,
-  "model_version": "v1.0.0-edge",
+  "risk_level": "WARNING",
   "timestamp": "2025-05-19T14:12:30.456Z",
-  "payload": {
-    "bbox": [200, 150, 280, 400],
-    "zone": "장비실-접근금지구역",
-    "frame_url": "s3://safety-platform-events/clips/EVT-20250519141230-001.mp4"
+  "event_state": "ACTIVE",
+  "worker_id": null,
+  "confidence": 0.88,
+  "model_version": "v1.0.0-tao-ds",
+  "context": {
+    "video_clip": {
+      "clip_path": "/data/clips/EVT-20250519141230-001.mp4",
+      "clip_s3_key": null,
+      "duration_sec": 60,
+      "pre_event_sec": 30,
+      "post_event_sec": 30,
+      "thumbnail_path": null
+    },
+    "sensor_snapshot": null,
+    "inference_detail": {
+      "model_version": "v1.0.0-tao-ds",
+      "class_id": 5,
+      "class_label": "intrusion",
+      "confidence": 0.88,
+      "bbox": { "x": 0.50, "y": 0.30, "w": 0.20, "h": 0.35 },
+      "tracker_id": 8,
+      "frame_number": 3600
+    },
+    "system_state": null
   },
-  "acknowledged": false,
-  "acknowledged_by": null,
-  "acknowledged_at": null,
-  "acknowledged_reason": null
+  "feedback_type": null,
+  "activity_index_history": null,
+  "baseline_profile": null,
+  "reanalysis_result": null,
+  "audit_hash": null,
+  "rag_reference": null
 }
