@@ -202,24 +202,165 @@ GitHub Actions 워크플로우: `.github/workflows/schema-validation.yml`
 
 ## For Other Sessions
 
-### Edge Device Session (S1)
+> 아래는 PR #19 (Edge), PR #18 (AWS), PR #20 (Training) 세션이
+> 자체 구현 시 이 테스트 스위트를 활용하는 방법입니다.
 
-- 이벤트를 생성할 때 `tests/fixtures/valid_events.json`의 형식을 따르세요
-- `tests/schema/models.py`의 `SafetyEvent`, `DsEventsMessage`, `SensorsMessage` 모델로 검증 가능
-- 실행: `pytest tests/schema/test_event_format.py -v`
+### Edge Device Session (S1 — PR #19)
 
-### AWS Cloud Session (S2)
+**목적:** DeepStream 파이프라인, Device Gateway, Event Engine, Alarm Controller가 생성하는 메시지의 스키마 적합성 검증
 
-- MQTT 페이로드는 `tests/fixtures/mqtt_payloads.json` 참고
-- `tests/schema/models.py`의 `MqttEventPayload`, `MqttStatusPayload` 모델 사용
-- Cloud queue 메시지 형식: `CloudQueueMessage` 모델 참고
-- 실행: `pytest tests/schema/test_mqtt_schema.py -v`
+**사용 모델:**
+| 모델 | import 경로 | 용도 |
+|-------|-------------|------|
+| `SafetyEvent` | `tests.schema.models` | 정규 이벤트 메시지 최종 검증 |
+| `DsEventsMessage` | `tests.schema.models` | stream:ds-events 발행 전 검증 |
+| `SensorsMessage` | `tests.schema.models` | stream:sensors 발행 전 검증 |
+| `AlarmsMessage` | `tests.schema.models` | stream:alarms 발행 전 검증 |
+| `DashboardMessage` | `tests.schema.models` | stream:dashboard 발행 전 검증 |
+| `ClipTriggerMessage` | `tests.schema.models` | stream:clip-trigger 발행 전 검증 |
 
-### AI Training Session (S3)
+**검증 예시:**
+```python
+from tests.schema.models import DsEventsMessage
+# DeepStream 출력을 검증
+msg = DsEventsMessage(**your_ds_output)  # ValidationError 시 스키마 위반
+```
 
-- 모델 패키지 구조: `tests/fixtures/model_registry.json` 참고
-- `tests/schema/models.py`의 `ModelRegistry`, `ModelEntry` 모델 사용
-- 실행: `pytest tests/schema/test_model_package.py -v`
+**사용 가능 테스트:**
+```bash
+# Edge가 생성하는 메시지 형식 검증
+pytest tests/schema/test_event_format.py -v
+pytest tests/schema/test_redis_stream_schema.py -v
+
+# Edge Event Engine 로직 기대값 확인
+pytest tests/integration/test_redis_pubsub.py -v
+
+# Edge mock producer를 자체 구현으로 교체하여 E2E 검증
+pytest tests/e2e/ -v
+```
+
+**Fixture 참고:**
+- `tests/fixtures/valid_events.json` — 10종 정상 이벤트 샘플
+- `tests/fixtures/redis_stream_messages.json` — 6개 stream별 메시지 샘플
+
+**주의사항:**
+- Redis는 null을 빈 문자열로 저장합니다. `worker_id=""` → Pydantic이 None으로 변환합니다.
+- `inference` 필드는 JSON 문자열로 Redis에 저장하고, 소비 시 `json.loads()`로 파싱해야 합니다.
+
+---
+
+### AWS Cloud Session (S2 — PR #18)
+
+**목적:** AWS Sync Service가 소비하는 cloud-queue 메시지와 MQTT 페이로드의 스키마 적합성 검증
+
+**사용 모델:**
+| 모델 | import 경로 | 용도 |
+|-------|-------------|------|
+| `CloudQueueMessage` | `tests.schema.models` | stream:cloud-queue 소비 시 검증 |
+| `MqttEventPayload` | `tests.schema.models` | MQTT events 토픽 발행 전 검증 |
+| `MqttStatusPayload` | `tests.schema.models` | MQTT status 토픽 발행 전 검증 |
+| `MqttModelDeployCommand` | `tests.schema.models` | MQTT models 토픽(Cloud→Edge) 검증 |
+| `MqttModelStatusReport` | `tests.schema.models` | MQTT models 토픽(Edge→Cloud) 검증 |
+
+**검증 예시:**
+```python
+from tests.schema.models import MqttEventPayload
+# IoT Core로 보낼 페이로드 검증
+payload = MqttEventPayload(**your_mqtt_payload)  # 형식 오류 시 즉시 탐지
+```
+
+**사용 가능 테스트:**
+```bash
+# MQTT 페이로드 스키마 검증
+pytest tests/schema/test_mqtt_schema.py -v
+
+# Cloud queue 메시지 스키마 (소비 측)
+pytest tests/schema/test_redis_stream_schema.py::TestCloudQueueStream -v
+
+# AWS receiver mock으로 E2E 흐름 확인
+pytest tests/integration/test_redis_pubsub.py::TestIT006CloudQueue -v
+pytest tests/integration/test_redis_pubsub.py::TestAwsReceiverTransform -v
+```
+
+**Fixture 참고:**
+- `tests/fixtures/mqtt_payloads.json` — 3개 MQTT 토픽(events, status, models) 페이로드
+- `tests/fixtures/redis_stream_messages.json["stream:cloud-queue"]` — cloud queue 메시지 샘플
+
+**주의사항:**
+- `idempotency_key`는 반드시 `{site_id}:{event_id}` 형식 (C-003 규칙)
+- `priority`는 risk_level에서 매핑: CRITICAL→HIGH, WARNING→NORMAL, NORMAL→LOW (C-004 규칙)
+- `clip_s3_key` 경로 패턴: `events/{site_id}/{YYYY}/{MM}/{DD}/{event_id}.mp4`
+
+---
+
+### AI Training Session (S3 — PR #20)
+
+**목적:** 모델 패키지 구조, registry.json, model_version 명명 규칙의 스키마 적합성 검증
+
+**사용 모델:**
+| 모델 | import 경로 | 용도 |
+|-------|-------------|------|
+| `ModelRegistry` | `tests.schema.models` | registry.json 전체 구조 검증 |
+| `ModelEntry` | `tests.schema.models` | 개별 모델 엔트리 검증 |
+| `ModelMetrics` | `tests.schema.models` | 모델 성능 메트릭 검증 |
+| `MqttModelDeployCommand` | `tests.schema.models` | 배포 명령 페이로드 검증 |
+| `MqttModelStatusReport` | `tests.schema.models` | 배포 상태 보고 검증 |
+
+**검증 예시:**
+```python
+from tests.schema.models import ModelRegistry
+import json
+# registry.json 유효성 검증
+with open("/models/registry.json") as f:
+    registry = ModelRegistry(**json.load(f))  # 스키마 위반 시 예외
+```
+
+**사용 가능 테스트:**
+```bash
+# 모델 패키지 스키마 검증
+pytest tests/schema/test_model_package.py -v
+
+# model_version 형식 검증
+pytest tests/schema/test_event_format.py::TestModelVersionFormat -v
+
+# MQTT 모델 배포 페이로드
+pytest tests/schema/test_mqtt_schema.py::TestMqttModelPayload -v
+```
+
+**Fixture 참고:**
+- `tests/fixtures/model_registry.json` — registry.json + metadata 예시
+- `tests/fixtures/mqtt_payloads.json["safety/{site_id}/models"]` — 배포 명령/상태 보고
+
+**주의사항:**
+- `model_version` 형식: `v{M}.{m}.{p}-{tool}-{target}` (tool: tao|pretrained|custom, target: ds|cloud)
+- `status` 유효값: ACTIVE, STAGED, ROLLBACK, ARCHIVED
+- `framework` 유효값: TAO, PyTorch, TensorFlow, ONNX
+- `precision` 유효값: FP16, FP32, INT8
+
+---
+
+### 세션 간 통합 검증 실행 방법
+
+```bash
+# 1. 의존성 설치 (한 번만)
+pip install -r requirements-test.txt
+
+# 2. 자기 세션 관련 테스트만 실행
+pytest tests/schema/test_event_format.py -v          # Edge (S1)
+pytest tests/schema/test_mqtt_schema.py -v           # AWS (S2)
+pytest tests/schema/test_model_package.py -v         # Training (S3)
+
+# 3. 전체 스키마 호환성 검증 (병합 전 필수)
+pytest tests/schema/ -v
+
+# 4. 통합 흐름 검증 (mock 기반, 외부 의존성 없음)
+pytest tests/integration/ tests/e2e/ -k "not Postgres" -v
+
+# 5. 전체 테스트 (Docker 환경 포함)
+./scripts/start-local-test-env.sh up
+pytest tests/ -v
+./scripts/start-local-test-env.sh down
+```
 
 ---
 

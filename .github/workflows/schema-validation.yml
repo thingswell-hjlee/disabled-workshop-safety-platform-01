@@ -2,16 +2,19 @@ name: Schema Validation
 
 on:
   push:
+    branches: [develop, main]
     paths:
       - 'tests/**'
       - 'docs/*-schema.md'
       - 'requirements-test.txt'
       - 'pytest.ini'
   pull_request:
+    branches: [develop, main]
     paths:
       - 'tests/**'
       - 'docs/*-schema.md'
       - 'requirements-test.txt'
+      - 'pytest.ini'
 
 jobs:
   schema-tests:
@@ -89,8 +92,10 @@ jobs:
         run: pip install -r requirements-test.txt
 
       - name: Initialize test database
+        env:
+          PGPASSWORD: test_password
         run: |
-          PGPASSWORD=test_password psql -h localhost -p 5433 -U safety_test -d safety_test -f tests/fixtures/init-db.sql
+          psql -h localhost -p 5433 -U safety_test -d safety_test -f tests/fixtures/init-db.sql
 
       - name: Run integration tests (fakeredis)
         run: pytest tests/integration/ -v --tb=short -k "not Postgres"
