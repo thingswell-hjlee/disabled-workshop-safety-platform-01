@@ -1,0 +1,37 @@
+{
+  "model_version": "v1.0.0-pretrained-ds",
+  "model_name": "safety_detector",
+  "model_type": "pgie",
+  "framework": "TAO",
+  "precision": "FP16",
+  "input_dims": {
+    "channels": 3,
+    "height": 544,
+    "width": 960
+  },
+  "classes": [
+    "person",
+    "fall",
+    "collapse",
+    "fire",
+    "intrusion",
+    "hazardous_action"
+  ],
+  "num_classes": 6,
+  "created_at": "2025-05-20T00:00:00.000Z",
+  "checksum": "sha256:placeholder_for_actual_engine_checksum",
+  "training_config": {
+    "base_model": "peoplenet_v2.6",
+    "epochs": 0,
+    "batch_size": 8,
+    "learning_rate": 0.001,
+    "dataset_version": "pretrained"
+  },
+  "evaluation": {
+    "mAP": 0.78,
+    "mAP_50": 0.88,
+    "inference_time_ms": 15.0,
+    "test_dataset_size": 0
+  },
+  "notes": "Pretrained PeopleNet v2.6 adapted for safety detection. Fine-tuning pending with site-specific data."
+}

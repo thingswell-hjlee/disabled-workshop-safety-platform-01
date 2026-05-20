@@ -51,6 +51,9 @@ secrets/
 *.pt
 *.pth
 models/
+# Allow sample model package (structure reference, no real engine files)
+!models/sample-model-package/
+!models/sample-model-package/**
 
 # Data
 data/

@@ -1,0 +1,43 @@
+# =============================================================================
+# TAO DetectNet_v2 Export Configuration
+# Platform 1.0 - Safety Detector ONNX Export
+#
+# Purpose: TAO model → ONNX conversion settings
+# =============================================================================
+
+# Export parameters
+export_config {
+  # Input model path (TAO trained model)
+  model_path: "/workspace/experiments/detectnet_v2/weights/model.tlt"
+  
+  # Output ONNX path
+  output_path: "/workspace/models/export/safety_detector.onnx"
+  
+  # Encryption key (must match training key)
+  key: "tlt_encode"
+  
+  # Data type for export
+  data_type: "fp16"
+  
+  # Batch size
+  batch_size: 8
+  max_batch_size: 8
+  
+  # Input dimensions (CHW)
+  input_dims: "3,544,960"
+  
+  # Backend
+  backend: "onnx"
+}
+
+# INT8 calibration (optional, for INT8 precision)
+int8_config {
+  # Calibration data path
+  calibration_data: "/workspace/datasets/processed/val/images"
+  
+  # Number of calibration batches
+  num_calibration_batches: 50
+  
+  # Calibration cache output
+  calibration_cache: "/workspace/models/export/cal.bin"
+}

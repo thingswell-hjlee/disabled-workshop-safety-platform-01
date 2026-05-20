@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "ds-v1.0",
+  "split_method": "random_stratified",
+  "split_ratio": {
+    "train": 0.8,
+    "val": 0.1,
+    "test": 0.1
+  },
+  "random_seed": 42,
+  "splits": {
+    "train": {
+      "path": "processed/train",
+      "image_dir": "images",
+      "label_dir": "labels",
+      "num_images": 0,
+      "file_list": "train.txt"
+    },
+    "val": {
+      "path": "processed/val",
+      "image_dir": "images",
+      "label_dir": "labels",
+      "num_images": 0,
+      "file_list": "val.txt"
+    },
+    "test": {
+      "path": "processed/test",
+      "image_dir": "images",
+      "label_dir": "labels",
+      "num_images": 0,
+      "file_list": "test.txt"
+    }
+  },
+  "notes": "Stratified split ensures each class is proportionally represented in all splits"
+}

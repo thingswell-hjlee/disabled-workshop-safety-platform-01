@@ -1,0 +1,28 @@
+# Actual training data - never commit to git
+raw/clips/*.mp4
+raw/clips/*/clip.mp4
+raw/frames/**/*.jpg
+raw/annotations/**/*.txt
+
+# Processed datasets
+processed/train/images/*.jpg
+processed/train/labels/*.txt
+processed/val/images/*.jpg
+processed/val/labels/*.txt
+processed/test/images/*.jpg
+processed/test/labels/*.txt
+
+# Keep structure files
+!raw/clips/.gitkeep
+!raw/frames/.gitkeep
+!raw/annotations/.gitkeep
+!processed/train/images/.gitkeep
+!processed/train/labels/.gitkeep
+!processed/val/images/.gitkeep
+!processed/val/labels/.gitkeep
+!processed/test/images/.gitkeep
+!processed/test/labels/.gitkeep
+
+# File lists
+*.txt
+!README.md
