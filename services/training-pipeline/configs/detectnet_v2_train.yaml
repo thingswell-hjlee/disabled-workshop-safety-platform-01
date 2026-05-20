@@ -1,0 +1,303 @@
+# =============================================================================
+# TAO DetectNet_v2 Training Configuration
+# Platform 1.0 - Safety Detector (6 classes)
+#
+# Base Model: PeopleNet v2.6 (ResNet34 backbone)
+# Input: 960x544x3 (CHW: 3x544x960)
+# Classes: person, fall, collapse, fire, intrusion, hazardous_action
+# =============================================================================
+
+random_seed: 42
+dataset_config {
+  data_sources {
+    tfrecords_path: "/workspace/datasets/tfrecords/train*"
+    image_directory_path: "/workspace/datasets/processed/train/images"
+  }
+  image_extension: "jpg"
+  target_class_mapping {
+    key: "person"
+    value: "person"
+  }
+  target_class_mapping {
+    key: "fall"
+    value: "fall"
+  }
+  target_class_mapping {
+    key: "collapse"
+    value: "collapse"
+  }
+  target_class_mapping {
+    key: "fire"
+    value: "fire"
+  }
+  target_class_mapping {
+    key: "intrusion"
+    value: "intrusion"
+  }
+  target_class_mapping {
+    key: "hazardous_action"
+    value: "hazardous_action"
+  }
+  validation_data_sources {
+    tfrecords_path: "/workspace/datasets/tfrecords/val*"
+    image_directory_path: "/workspace/datasets/processed/val/images"
+  }
+}
+
+augmentation_config {
+  preprocessing {
+    output_image_width: 960
+    output_image_height: 544
+    output_image_channel: 3
+    min_bbox_width: 10.0
+    min_bbox_height: 10.0
+  }
+  spatial_augmentation {
+    hflip_probability: 0.5
+    vflip_probability: 0.0
+    zoom_min: 1.0
+    zoom_max: 1.0
+    translate_max_x: 8.0
+    translate_max_y: 8.0
+  }
+  color_augmentation {
+    hue_rotation_max: 25.0
+    saturation_shift_max: 20.0
+    contrast_scale_max: 0.1
+    contrast_center: 0.5
+  }
+}
+
+training_config {
+  batch_size_per_gpu: 8
+  num_epochs: 100
+  learning_rate {
+    soft_start_annealing_schedule {
+      min_learning_rate: 5e-6
+      max_learning_rate: 5e-4
+      soft_start: 0.1
+      annealing: 0.7
+    }
+  }
+  regularizer {
+    type: L1
+    weight: 3e-9
+  }
+  optimizer {
+    adam {
+      epsilon: 1e-7
+      beta1: 0.9
+      beta2: 0.999
+      amsgrad: false
+    }
+  }
+  cost_scaling {
+    initial_exponent: 20.0
+    increment: 0.005
+    decrement: 1.0
+  }
+  checkpoint_interval: 10
+  enable_qat: false
+}
+
+eval_config {
+  average_precision_mode: INTEGRATE
+  batch_size: 8
+  matching_iou_threshold: 0.5
+}
+
+nms_config {
+  confidence_threshold: 0.4
+  clustering_iou_threshold: 0.5
+  top_k: 200
+}
+
+bbox_rasterizer_config {
+  target_class_config {
+    key: "person"
+    value {
+      cov_center_x: 0.5
+      cov_center_y: 0.5
+      cov_radius_x: 0.4
+      cov_radius_y: 0.4
+      bbox_min_radius: 1.0
+    }
+  }
+  target_class_config {
+    key: "fall"
+    value {
+      cov_center_x: 0.5
+      cov_center_y: 0.5
+      cov_radius_x: 0.4
+      cov_radius_y: 0.4
+      bbox_min_radius: 1.0
+    }
+  }
+  target_class_config {
+    key: "collapse"
+    value {
+      cov_center_x: 0.5
+      cov_center_y: 0.5
+      cov_radius_x: 0.4
+      cov_radius_y: 0.4
+      bbox_min_radius: 1.0
+    }
+  }
+  target_class_config {
+    key: "fire"
+    value {
+      cov_center_x: 0.5
+      cov_center_y: 0.5
+      cov_radius_x: 0.4
+      cov_radius_y: 0.4
+      bbox_min_radius: 1.0
+    }
+  }
+  target_class_config {
+    key: "intrusion"
+    value {
+      cov_center_x: 0.5
+      cov_center_y: 0.5
+      cov_radius_x: 0.4
+      cov_radius_y: 0.4
+      bbox_min_radius: 1.0
+    }
+  }
+  target_class_config {
+    key: "hazardous_action"
+    value {
+      cov_center_x: 0.5
+      cov_center_y: 0.5
+      cov_radius_x: 0.4
+      cov_radius_y: 0.4
+      bbox_min_radius: 1.0
+    }
+  }
+  dead_zone_radius: 0.4
+}
+
+postprocessing_config {
+  target_class_config {
+    key: "person"
+    value {
+      clustering_config {
+        coverage_threshold: 0.005
+        dbscan_eps: 0.2
+        dbscan_min_samples: 1
+        minimum_bounding_box_height: 20
+      }
+    }
+  }
+  target_class_config {
+    key: "fall"
+    value {
+      clustering_config {
+        coverage_threshold: 0.005
+        dbscan_eps: 0.2
+        dbscan_min_samples: 1
+        minimum_bounding_box_height: 20
+      }
+    }
+  }
+  target_class_config {
+    key: "collapse"
+    value {
+      clustering_config {
+        coverage_threshold: 0.005
+        dbscan_eps: 0.2
+        dbscan_min_samples: 1
+        minimum_bounding_box_height: 20
+      }
+    }
+  }
+  target_class_config {
+    key: "fire"
+    value {
+      clustering_config {
+        coverage_threshold: 0.005
+        dbscan_eps: 0.2
+        dbscan_min_samples: 1
+        minimum_bounding_box_height: 20
+      }
+    }
+  }
+  target_class_config {
+    key: "intrusion"
+    value {
+      clustering_config {
+        coverage_threshold: 0.005
+        dbscan_eps: 0.2
+        dbscan_min_samples: 1
+        minimum_bounding_box_height: 20
+      }
+    }
+  }
+  target_class_config {
+    key: "hazardous_action"
+    value {
+      clustering_config {
+        coverage_threshold: 0.005
+        dbscan_eps: 0.2
+        dbscan_min_samples: 1
+        minimum_bounding_box_height: 20
+      }
+    }
+  }
+}
+
+model_config {
+  pretrained_model_file: "/workspace/models/pretrained/peoplenet_v2.6/model.tlt"
+  num_layers: 34
+  arch: "resnet"
+  use_batch_norm: true
+  objective_set {
+    bbox {
+      scale: 35.0
+      offset: 0.5
+    }
+    cov {
+    }
+  }
+  training_precision {
+    backend_floatx: FLOAT32
+  }
+}
+
+cost_function_config {
+  target_classes {
+    name: "person"
+    class_weight: 1.0
+    coverage_foreground_weight: 0.05
+    enable_autoweight: true
+  }
+  target_classes {
+    name: "fall"
+    class_weight: 2.0
+    coverage_foreground_weight: 0.1
+    enable_autoweight: true
+  }
+  target_classes {
+    name: "collapse"
+    class_weight: 2.0
+    coverage_foreground_weight: 0.1
+    enable_autoweight: true
+  }
+  target_classes {
+    name: "fire"
+    class_weight: 2.0
+    coverage_foreground_weight: 0.1
+    enable_autoweight: true
+  }
+  target_classes {
+    name: "intrusion"
+    class_weight: 1.5
+    coverage_foreground_weight: 0.05
+    enable_autoweight: true
+  }
+  target_classes {
+    name: "hazardous_action"
+    class_weight: 1.5
+    coverage_foreground_weight: 0.05
+    enable_autoweight: true
+  }
+}

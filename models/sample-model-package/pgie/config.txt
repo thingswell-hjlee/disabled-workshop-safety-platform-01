@@ -1,0 +1,47 @@
+# DeepStream nvinfer Configuration - Safety Detector (PGIE)
+# Platform 1.0 | model_version: v1.0.0-pretrained-ds
+
+[property]
+gpu-id=0
+net-scale-factor=0.0039215697906911373
+model-engine-file=/models/active/pgie/model.engine
+labelfile-path=/models/active/pgie/labels.txt
+batch-size=8
+process-mode=1
+model-color-format=0
+network-mode=1
+num-detected-classes=6
+interval=0
+gie-unique-id=1
+output-blob-names=output_cov/Sigmoid;output_bbox/BiasAdd
+cluster-mode=2
+
+[class-attrs-all]
+pre-cluster-threshold=0.4
+topk=20
+nms-iou-threshold=0.5
+
+# Class-specific thresholds (Platform 1.0 defaults)
+# class_id 0: person
+[class-attrs-0]
+pre-cluster-threshold=0.4
+
+# class_id 1: fall (CRITICAL)
+[class-attrs-1]
+pre-cluster-threshold=0.5
+
+# class_id 2: collapse (CRITICAL)
+[class-attrs-2]
+pre-cluster-threshold=0.5
+
+# class_id 3: fire (CRITICAL)
+[class-attrs-3]
+pre-cluster-threshold=0.6
+
+# class_id 4: intrusion (WARNING)
+[class-attrs-4]
+pre-cluster-threshold=0.5
+
+# class_id 5: hazardous_action (WARNING)
+[class-attrs-5]
+pre-cluster-threshold=0.5

@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "platform_version": "1.0",
+  "description": "Platform 1.0 Safety Detection Classes - TAO/DeepStream compatible",
+  "num_classes": 6,
+  "classes": [
+    {
+      "class_id": 0,
+      "class_name": "person",
+      "display_name": "사람",
+      "event_type": null,
+      "risk_level": "NORMAL",
+      "color_rgb": [0, 255, 0]
+    },
+    {
+      "class_id": 1,
+      "class_name": "fall",
+      "display_name": "낙상",
+      "event_type": "FALL_DETECTED",
+      "risk_level": "CRITICAL",
+      "color_rgb": [255, 0, 0]
+    },
+    {
+      "class_id": 2,
+      "class_name": "collapse",
+      "display_name": "쓰러짐",
+      "event_type": "COLLAPSE_DETECTED",
+      "risk_level": "CRITICAL",
+      "color_rgb": [255, 50, 0]
+    },
+    {
+      "class_id": 3,
+      "class_name": "fire",
+      "display_name": "화재",
+      "event_type": "FIRE_DETECTED",
+      "risk_level": "CRITICAL",
+      "color_rgb": [255, 165, 0]
+    },
+    {
+      "class_id": 4,
+      "class_name": "intrusion",
+      "display_name": "위험구역 침입",
+      "event_type": "ZONE_INTRUSION",
+      "risk_level": "WARNING",
+      "color_rgb": [255, 255, 0]
+    },
+    {
+      "class_id": 5,
+      "class_name": "hazardous_action",
+      "display_name": "위험 행동",
+      "event_type": "HAZARDOUS_ACTION",
+      "risk_level": "WARNING",
+      "color_rgb": [255, 128, 0]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "site_id": "SITE-001",
+  "last_updated": "2025-05-20T00:00:00.000Z",
+  "models": [
+    {
+      "model_version": "v1.0.0-pretrained-ds",
+      "model_type": "pgie",
+      "model_name": "safety_detector",
+      "framework": "TAO",
+      "precision": "FP16",
+      "engine_path": "/models/active/pgie/model.engine",
+      "labels_path": "/models/active/pgie/labels.txt",
+      "config_path": "/models/active/pgie/config.txt",
+      "status": "ACTIVE",
+      "deployed_at": "2025-05-20T00:00:00.000Z",
+      "metrics": {
+        "mAP": 0.78,
+        "inference_time_ms": 15.0,
+        "fps": 30,
+        "classes": 6
+      }
+    }
+  ]
+}
