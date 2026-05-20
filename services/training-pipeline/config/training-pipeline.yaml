@@ -1,0 +1,60 @@
+# Training Pipeline Configuration - Platform 1.0
+service:
+  name: training-pipeline
+  version: "1.0.0"
+  host: "0.0.0.0"
+  port: 8006
+
+site:
+  id: "SITE-001"
+
+gpu:
+  device: "cuda:0"
+  max_memory_percent: 90
+
+data_collection:
+  source: "edge-ai-inference"  # subscribe to inference results
+  storage_path: "/data/training"
+  auto_split_ratio:
+    train: 0.8
+    val: 0.1
+    test: 0.1
+  priority_event_types:
+    - "FALL_DETECTED"
+    - "ZONE_INTRUSION"
+    - "ABNORMAL_BEHAVIOR"
+  max_storage_gb: 100
+
+training:
+  default_config:
+    base_model: "yolov8n.pt"
+    epochs: 50
+    batch_size: 16
+    learning_rate: 0.001
+    image_size: 640
+    augmentation: true
+    early_stopping_patience: 10
+  output_path: "/models/trained"
+
+optimization:
+  target: "TensorRT_INT8"
+  calibration_samples: 100
+  max_accuracy_drop_percent: 5.0
+  output_path: "/models/optimized"
+
+deployment:
+  edge_ai_server_url: "http://ai-inference:8002"
+  model_reload_endpoint: "/api/v1/models/{model_id}/reload"
+  health_check_endpoint: "/health"
+  rollback_on_failure: true
+  post_deploy_validation_samples: 20
+
+model_registry:
+  cloud_sync: true
+  s3_bucket: "${AWS_S3_BUCKET:-safety-platform-models}"
+  s3_prefix: "models/"
+
+redis:
+  host: "${REDIS_HOST:-localhost}"
+  port: ${REDIS_PORT:-6379}
+  input_stream: "stream:events"  # for data collection triggers

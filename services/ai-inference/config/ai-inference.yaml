@@ -1,0 +1,53 @@
+# AI Inference Engine Configuration - Platform 1.0
+service:
+  name: ai-inference
+  version: "1.0.0"
+  host: "0.0.0.0"
+  port: 8002
+
+site:
+  id: "SITE-001"
+
+redis:
+  host: "${REDIS_HOST:-localhost}"
+  port: ${REDIS_PORT:-6379}
+  input_streams:
+    - "stream:frames:*"
+    - "stream:bio"
+    - "stream:sensors"
+  output_stream: "stream:events"
+
+gpu:
+  device: "cuda:0"
+  max_batch_size: 8
+
+models:
+  - id: "yolov8-safety"
+    type: "object_detection"
+    path: "/models/yolov8-safety.engine"
+    version: "v1.0.0-edge"
+    framework: "tensorrt"
+    input_shape: [1, 3, 640, 640]
+    confidence_threshold: 0.7
+
+thresholds:
+  environment:
+    temperature_max: 40.0
+    humidity_max: 85.0
+    co_ppm_max: 50.0
+    voc_ppb_max: 500.0
+  biometric:
+    heartrate_min: 40
+    heartrate_max: 150
+    body_temp_min: 35.0
+    body_temp_max: 38.5
+    band_timeout_seconds: 30
+  confidence:
+    fall_min: 0.70
+    behavior_min: 0.65
+    zone_min: 0.75
+
+inference:
+  frame_skip: 2  # process every Nth frame
+  max_channels: 8
+  timeout_ms: 2000
