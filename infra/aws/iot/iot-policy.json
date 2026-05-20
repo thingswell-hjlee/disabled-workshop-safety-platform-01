@@ -1,0 +1,47 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowPublishToSiteTopics",
+      "Effect": "Allow",
+      "Action": [
+        "iot:Publish"
+      ],
+      "Resource": [
+        "arn:aws:iot:${aws_region}:${account_id}:topic/safety/${site_id}/events",
+        "arn:aws:iot:${aws_region}:${account_id}:topic/safety/${site_id}/status",
+        "arn:aws:iot:${aws_region}:${account_id}:topic/safety/${site_id}/models"
+      ]
+    },
+    {
+      "Sid": "AllowSubscribeToModels",
+      "Effect": "Allow",
+      "Action": [
+        "iot:Subscribe"
+      ],
+      "Resource": [
+        "arn:aws:iot:${aws_region}:${account_id}:topicfilter/safety/${site_id}/models"
+      ]
+    },
+    {
+      "Sid": "AllowReceiveFromModels",
+      "Effect": "Allow",
+      "Action": [
+        "iot:Receive"
+      ],
+      "Resource": [
+        "arn:aws:iot:${aws_region}:${account_id}:topic/safety/${site_id}/models"
+      ]
+    },
+    {
+      "Sid": "AllowConnect",
+      "Effect": "Allow",
+      "Action": [
+        "iot:Connect"
+      ],
+      "Resource": [
+        "arn:aws:iot:${aws_region}:${account_id}:client/${site_id}-edge-*"
+      ]
+    }
+  ]
+}
